@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   import { Card } from "flowbite-svelte";
-  import { user, posts } from "../../stores";
+  import { user, posts, userName } from "../../stores";
   import { onMount } from "svelte";
   let title = "";
   let content = "";
@@ -8,18 +8,17 @@
   /**
    * @type {any[]}
    */
-  let postList = [];
+  let postList: any[] = [];
 
-  posts.subscribe((list) => {
-    postList = list;
-  });
   onMount(() => {
-    getPosts()
-    user.subscribe((name) => {
-        username = name;
+    getPosts();
+    posts.subscribe((list) => {
+      postList = list;
     });
-    console.log(username)
-  })
+    user.subscribe((name) => {
+      username = name;
+    });
+  });
 
   async function getPosts() {
     const res = await fetch("http://localhost:4000", {
@@ -30,6 +29,7 @@
       body: JSON.stringify({
         query: `query Query {
                 feed {
+                    id
                     title
                     content
                     author {
@@ -40,24 +40,28 @@
       }),
     });
     let result = "";
-      // @ts-ignore
-      for await (const chunk of res.body) {
-        const decoded = new TextDecoder().decode(chunk);
-        result += decoded;
-      }
-      const response = JSON.parse(result);
-      // @ts-ignore
-      posts.update((posts) => posts = [...response.data.feed])
-      console.log(postList)
+    // @ts-ignore
+    for await (const chunk of res.body) {
+      const decoded = new TextDecoder().decode(chunk);
+      result += decoded;
+    }
+    const response = JSON.parse(result);
+    // @ts-ignore
+    posts.update((posts) => (posts = [...response.data.feed]));
   }
   async function send() {
+    console.log($userName, $user);
     const postCreateInput = {
       title,
       content,
-      author: username
+      author: {
+        name: $userName,
+        email: $user,
+      },
     };
     const quer = `mutation Mutation($postCreateInput: PostCreateInput!) {
             createPost(postCreateInput: $postCreateInput) {
+                id
                 title
                 content
                 author {
@@ -66,10 +70,8 @@
                 }
             }
         }`;
-    if (title != "" && content != "") {
-        postList.push(postCreateInput)
-        postList = postList;
-        const post = await fetch("http://localhost:4000", {
+    if (title != "" && content != "" && $userName != "" && $user != "") {
+      const post = await fetch("http://localhost:4000", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,19 +90,60 @@
         result += decoded;
       }
       const response = JSON.parse(result);
+      console.log(response);
+      getPosts();
       // @ts-ignore
-      console.log(response)
-    } else alert("pleae fill title and content before sending");
+    } else alert("Please fill title and content, or relogin");
+  }
+
+  async function deletePost(id: number) {
+    const quer = `mutation Mutation($id: Int!) {
+            deletePost(id: $id) {
+                id
+            }
+        }`;
+    const post = await fetch("http://localhost:4000", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: quer,
+        variables: {
+          id: id,
+        },
+      }),
+    });
+    let result = "";
+    // @ts-ignore
+    for await (const chunk of post.body) {
+      const decoded = new TextDecoder().decode(chunk);
+      result += decoded;
+    }
+    const response = JSON.parse(result);
+    console.log(id)
+    console.log(response);
+    getPosts();
   }
 </script>
 
 <div class=" h-screen w-screen flex flex-col justify-center items-start">
-  <div class="w-full basis-3/5 border-solid border border-gray-600 overflow-scroll">
-    {#each postList as post}
+  <div
+    class="w-full basis-3/5 border-solid border border-gray-600 overflow-scroll"
+  >
+    {#each postList as post (post.id)}
       <Card class="bg-gray-900 mt-5 ml-5 mb-5 w-2/5">
         <h1 class="font-bold text-gray-200">{post.author?.name}</h1>
         <h1 class="font-bold text-gray-200">{post.title}</h1>
         <p class="text-gray-400">{post.content}</p>
+        {#if post.author?.name == $userName}
+          <button
+            class="text-gray-400 font-bold hover:bg-gray-600 duration-300"
+            on:click={() => deletePost(post.id)}
+          >
+            Delete
+          </button>
+        {/if}
       </Card>
     {/each}
   </div>

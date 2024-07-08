@@ -30,17 +30,16 @@ declare global {
 
 export interface NexusGenInputs {
   PostCreateInput: { // input type
-    author: string; // String!
+    author: NexusGenInputs['UserBasicInput']; // UserBasicInput!
     content?: string | null; // String
     title: string; // String!
   }
   PostOrderByUpdatedAtInput: { // input type
     updatedAt: NexusGenEnums['SortOrder']; // SortOrder!
   }
-  UserCreateInput: { // input type
+  UserBasicInput: { // input type
     email: string; // String!
     name?: string | null; // String
-    posts?: NexusGenInputs['PostCreateInput'][] | null; // [PostCreateInput!]
   }
   UserUniqueInput: { // input type
     email?: string | null; // String
@@ -94,8 +93,6 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createPost: NexusGenRootTypes['Post'] | null; // Post
     deletePost: NexusGenRootTypes['Post'] | null; // Post
-    signupUser: NexusGenRootTypes['User']; // User!
-    togglePublishPost: NexusGenRootTypes['Post'] | null; // Post
   }
   Post: { // field return type
     author: NexusGenRootTypes['User'] | null; // User
@@ -125,8 +122,6 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     createPost: 'Post'
     deletePost: 'Post'
-    signupUser: 'User'
-    togglePublishPost: 'Post'
   }
   Post: { // field return type name
     author: 'User'
@@ -158,12 +153,6 @@ export interface NexusGenArgTypes {
       postCreateInput: NexusGenInputs['PostCreateInput']; // PostCreateInput!
     }
     deletePost: { // args
-      id: number; // Int!
-    }
-    signupUser: { // args
-      data: NexusGenInputs['UserCreateInput']; // UserCreateInput!
-    }
-    togglePublishPost: { // args
       id: number; // Int!
     }
   }

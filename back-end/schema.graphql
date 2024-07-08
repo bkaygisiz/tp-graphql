@@ -10,8 +10,6 @@ scalar DateTime
 type Mutation {
   createPost(postCreateInput: PostCreateInput!): Post
   deletePost(id: Int!): Post
-  signupUser(data: UserCreateInput!): User!
-  togglePublishPost(id: Int!): Post
 }
 
 type Post {
@@ -26,7 +24,7 @@ type Post {
 }
 
 input PostCreateInput {
-  author: String!
+  author: UserBasicInput!
   content: String
   title: String!
 }
@@ -54,10 +52,9 @@ type User {
   posts: [Post!]!
 }
 
-input UserCreateInput {
+input UserBasicInput {
   email: String!
   name: String
-  posts: [PostCreateInput!]
 }
 
 input UserUniqueInput {

@@ -50,56 +50,6 @@ export const Query = objectType({
  export const Mutation = objectType({
     name: 'Mutation',
     definition(t) {
-      t.nonNull.field('signupUser', {
-        type: 'User',
-        args: {
-          data: nonNull(
-            arg({
-              type: 'UserCreateInput',
-            }),
-          ),
-        },
-        resolve: (_, args, context: Context) => {
-          const postData = args.data.posts?.map((post) => {
-            return { title: post.title, content: post.content || undefined }
-          })
-          return context.prisma.user.create({
-            data: {
-              name: args.data.name,
-              email: args.data.email,
-              posts: {
-                create: postData,
-              },
-            },
-          })
-        },
-      })
-  
-      t.field('togglePublishPost', {
-        type: 'Post',
-        args: {
-          id: nonNull(intArg()),
-        },
-        resolve: async (_, args, context: Context) => {
-          try {
-            const post = await context.prisma.post.findUnique({
-              where: { id: args.id || undefined },
-              select: {
-                published: true,
-              },
-            })
-            return context.prisma.post.update({
-              where: { id: args.id || undefined },
-              data: { published: !post?.published },
-            })
-          } catch (e) {
-            throw new Error(
-              `Post with ID ${args.id} does not exist in the database.`,
-            )
-          }
-        },
-      })
-
       t.field('createPost', {
         type: 'Post',
         args: {
@@ -116,8 +66,10 @@ export const Query = objectType({
               content: args.postCreateInput.content
             }
           })
+          console.log(post)
+          console.log(args.postCreateInput.author?.name)
           await context.prisma.user.update({
-            where: { email: args.postCreateInput.author },
+            where: { email: args.postCreateInput.author?.email },
             data: {
               posts: {
                 connect: { id: post.id}
@@ -209,15 +161,14 @@ export const Post = objectType({
     definition(t) {
       t.nonNull.string('title')
       t.string('content')
-      t.nonNull.string('author')
+      t.nonNull.field('author', { type: 'UserBasicInput' })
     },
   })
   
-  export const UserCreateInput = inputObjectType({
-    name: 'UserCreateInput',
+  export const UserBasicInput = inputObjectType({
+    name: 'UserBasicInput',
     definition(t) {
       t.nonNull.string('email')
       t.string('name')
-      t.list.nonNull.field('posts', { type: 'PostCreateInput' })
     },
   })

@@ -1,7 +1,7 @@
 <script>
   import { redirect } from "@sveltejs/kit";
   import { goto } from "$app/navigation";
-  import { user } from "../stores"
+  import { user, userName } from "../stores"
 
   let email = "";
 
@@ -34,6 +34,7 @@
       const response = JSON.parse(result);
       if (response.data.userByEmail) {
         user.update((name) => name = response.data.userByEmail.email)
+        userName.update((name) => name = response.data.userByEmail.name)
         goto("/forum")
       }
       else
