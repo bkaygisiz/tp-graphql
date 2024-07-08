@@ -5,16 +5,9 @@
   let title = "";
   let content = "";
   let username = "";
-  /**
-   * @type {any[]}
-   */
-  let postList: any[] = [];
 
   onMount(() => {
     getPosts();
-    posts.subscribe((list) => {
-      postList = list;
-    });
     user.subscribe((name) => {
       username = name;
     });
@@ -126,12 +119,11 @@
     getPosts();
   }
 </script>
-
 <div class=" h-screen w-screen flex flex-col justify-center items-start">
   <div
     class="w-full basis-3/5 border-solid border border-gray-600 overflow-scroll"
   >
-    {#each postList as post (post.id)}
+    {#each $posts as post (post.id)}
       <Card class="bg-gray-900 mt-5 ml-5 mb-5 w-2/5">
         <h1 class="font-bold text-gray-200">{post.author?.name}</h1>
         <h1 class="font-bold text-gray-200">{post.title}</h1>
@@ -150,22 +142,22 @@
   <div
     class="w-full flex flex-col basis-2/5 border-solid border border-gray-600"
   >
-    <label class="mt-5 bg-gray-900 text-gray-400 font-bold" for="title"
+    <label class="mt-5 mx-5 bg-gray-900 text-gray-400 font-bold" for="title"
       >Title</label
     >
     <input
       id="title"
-      class="mt-5 bg-gray-900 text-gray-400"
+      class="mt-5 mx-5 bg-gray-900 text-gray-400"
       type="text"
       bind:value={title}
     />
-    <label class="mt-5 bg-gray-900 text-gray-400 font-bold" for="content"
+    <label class="mt-5 mx-5 bg-gray-900 text-gray-400 font-bold" for="content"
       >Message</label
     >
     <textarea
       name="content"
       id="content"
-      class="mt-5 h-full bg-gray-900 text-gray-400"
+      class="mt-5 mx-5 h-full bg-gray-900 text-gray-400"
       bind:value={content}
     />
     <button

@@ -29,20 +29,11 @@ input PostCreateInput {
   title: String!
 }
 
-input PostOrderByUpdatedAtInput {
-  updatedAt: SortOrder!
-}
-
 type Query {
   allUsers: [User!]!
   feed: [Post!]!
   postById(id: Int): Post
   userByEmail(email: String): User
-}
-
-enum SortOrder {
-  asc
-  desc
 }
 
 type User {
@@ -55,9 +46,4 @@ type User {
 input UserBasicInput {
   email: String!
   name: String
-}
-
-input UserUniqueInput {
-  email: String
-  id: Int
 }

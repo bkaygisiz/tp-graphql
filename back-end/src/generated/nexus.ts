@@ -34,21 +34,13 @@ export interface NexusGenInputs {
     content?: string | null; // String
     title: string; // String!
   }
-  PostOrderByUpdatedAtInput: { // input type
-    updatedAt: NexusGenEnums['SortOrder']; // SortOrder!
-  }
   UserBasicInput: { // input type
     email: string; // String!
     name?: string | null; // String
   }
-  UserUniqueInput: { // input type
-    email?: string | null; // String
-    id?: number | null; // Int
-  }
 }
 
 export interface NexusGenEnums {
-  SortOrder: "asc" | "desc"
 }
 
 export interface NexusGenScalars {
@@ -87,7 +79,7 @@ export interface NexusGenUnions {
 
 export type NexusGenRootTypes = NexusGenObjects
 
-export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
@@ -176,7 +168,7 @@ export type NexusGenObjectNames = keyof NexusGenObjects;
 
 export type NexusGenInputNames = keyof NexusGenInputs;
 
-export type NexusGenEnumNames = keyof NexusGenEnums;
+export type NexusGenEnumNames = never;
 
 export type NexusGenInterfaceNames = never;
 
